@@ -1,0 +1,114 @@
+
+# Playbook to create EC2 instance and necessary AWS resources
+
+- name: Create EC2 and necessary AWS resources
+# This task is responsible for creating EC2 instances and other required AWS resources.
+
+  hosts: localhost
+# The playbook will be executed on the localhost.
+
+  gather_facts: no
+# Facts gathering will be disabled for this playbook.
+
+  vars:
+# Define variables used in the playbook.
+
+    region: us-east-1
+# The AWS region where the resources will be created.
+
+    instance_type: t2.micro
+# The EC2 instance type.
+
+    ami_id: ami-04e5276ebb8451442
+# The ID of the Amazon Machine Image (AMI) to use for the EC2 instance.
+
+    vpc_cidr_block: 10.0.0.0/16
+# The CIDR block for the VPC.
+
+    subnet_cidr_block: 10.0.1.0/24
+# The CIDR block for the subnet.
+
+    security_group_cidr_ingress: 0.0.0.0/0
+# The CIDR block for inbound traffic to the security group.
+
+    security_group_cidr_egress: 0.0.0.0/0
+# The CIDR block for outbound traffic from the security group.
+
+    security_group_ports:
+      - 80
+      - 443
+# The list of ports to open in the security group.
+
+  tasks:
+# Define the tasks to be executed in the playbook.
+
+    - name: Create VPC
+# This task creates a Virtual Private Cloud (VPC) in AWS.
+
+      ec2_vpc_net:
+        name: MyVPC
+# The name of the VPC.
+
+        cidr_block: "{{ vpc_cidr_block }}"
+# The CIDR block for the VPC.
+
+        region: "{{ region }}"
+# The AWS region where the VPC will be created.
+
+        tags:
+          Name: MyVPC
+# Tags to assign to the VPC.
+
+      register: my_vpc
+# Register the output of this task to a variable named "my_vpc".
+
+      tags: vpc
+# Assign the tag "vpc" to this task.
+
+    - name: Output VPC ID
+# This task outputs the ID of the created VPC.
+      debug:
+        msg: "VPC ID is {{ my_vpc.vpc.id }}"
+
+      tags: vpc
+# Assign the tag "vpc" to this task.
+        rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: "{{ security_group_cidr_ingress }}"
+          - proto: tcp
+            from_port: 443
+            to_port: 443
+            cidr_ip: "{{ security_group_cidr_ingress }}"
+        rules_egress:
+          - proto: all
+            cidr_ip: "{{ security_group_cidr_egress }}"
+      register: security_group
+      tags: security_group
+# Assign the tag "security_group" to this task.
+    - name: Output Security Group ID
+      debug:
+        msg: "Security Group ID is {{ security_group.group_id }}"
+      tags: security_group
+# Create a subnet
+    - name: Launch instance
+      ec2_instance:
+        name: "MyInstance"
+        instance_type: "{{ instance_type }}"
+        region: "{{ region }}"
+        image_id: "{{ ami_id }}"
+        subnet_id: "{{ my_subnet.subnet.id }}"
+        wait: yes
+        security_group: "{{ security_group.group_id }}"
+        network:
+          assign_public_ip: true
+        tags:
+          Environment: Testing
+      register: ec2
+      tags: instance
+# Output the instance ID
+    - name: Output Instance Details
+      debug:
+        msg: "Instance ID is {{ ec2.instances[0].instance_id }}"
+      tags: instance
