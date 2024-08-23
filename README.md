@@ -30,10 +30,14 @@ This project utilizes Ansible playbooks to automate the creation and management 
    ```sh
    ansible-vault encrypt secrets.yml
    ```
+![ansible-vault](https://github.com/user-attachments/assets/78e74dd4-cc53-40da-b042-3c29a3fa5f95)
+
+   
 2. **Run the playbook**:
    ```sh
    ansible-playbook ec2_playbook.yml --ask-vault-pass
    ```
+![ansible-EC2-created](https://github.com/user-attachments/assets/ea2e5691-1bc7-47a7-8570-8f193277bce7)
 
 ### Inventory Management
 The project utilizes a dynamic inventory configuration (`dynamic_inventory_aws_ec2.yaml`) to automatically discover and manage AWS EC2 instances. This configuration groups instances based on various criteria such as region, environment, and operating system.
@@ -43,6 +47,7 @@ After running the playbook, you can verify the created resources and their group
 ```sh
 ansible-inventory -i dynamic_inventory_aws_ec2.yaml --graph
 ```
+![graph-output](https://github.com/user-attachments/assets/5c4a1807-3c8e-4718-9f7d-71f1f5163f1b)
 
 ## Conclusion
 This project showcases how Ansible can be used to automate the management of AWS infrastructure. By treating infrastructure as code, we can achieve consistent and reproducible deployments, simplifying the management and scalability of our AWS resources.
