@@ -1,0 +1,43 @@
+# This YAML file is used as a dynamic inventory for Ansible to manage AWS EC2 instances.
+
+# It specifies the plugin to be used as 'aws_ec2' and provides configuration options for the inventory.
+
+plugin: aws_ec2
+
+# The 'regions' section specifies the AWS regions to be included in the inventory.
+regions:
+  - us-east-1
+  - us-west-2
+
+# The 'filters' section specifies the filters to be applied when retrieving the inventory.
+filters:
+  instance-state-name: 
+    - running
+    - stopped
+
+# The 'hostnames' section specifies the attributes to be used as hostnames for the inventory.
+# In this case, it uses the 'Name' tag and the private IP address.
+
+hostnames:
+  - tag:Name
+  - private_ip_address
+
+# The 'compose' section defines the attributes to be composed for each host in the inventory.
+compose:
+  ansible_host: public_ip_address
+  ansible_private_ip: private_ip_address
+  ansible_public_ip: public_ip_address
+  ansible_os_family: platform
+
+# The 'keyed_groups' section defines the groups to be created based on specific keys.
+keyed_groups:
+  - key: placement.region
+    prefix: aws_region_
+  - key: tags['Environment']
+    prefix: env_
+  - key: tags['Role']
+    prefix: role_
+  - key: platform
+    prefix: os_
+  - key: instance-state-name
+    prefix: state_
