@@ -50,13 +50,13 @@ ansible-inventory -i dynamic_inventory_aws_ec2.yaml --graph
 ```
 ![graph-output](https://github.com/user-attachments/assets/5c4a1807-3c8e-4718-9f7d-71f1f5163f1b)
 
-
 ### Cleanup Playbook
 To clean up and delete the AWS resources that were provisioned by (`ec2_playbook.yaml`)
-**Run the cleanup playbook**:
+#### Run the cleanup playbook:
    ```sh
    ansible-playbook cleanup_playbook.yaml
    ```
+![cleanup](https://github.com/user-attachments/assets/d25ff407-98f5-4265-b31c-55950a2488ac)
 
 This playbook will clean up and delete the AWS resources that were provisioned by the (`ec2_playbook.yaml`)
 
